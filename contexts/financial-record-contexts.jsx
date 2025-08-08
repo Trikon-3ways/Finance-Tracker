@@ -4,19 +4,37 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export const FinancialRecordContext = createContext(undefined);
 
+// Get API URL from environment variable or use localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+console.log('API_BASE_URL:', API_BASE_URL); // Debug log
+
 export const FinancialRecordContextProvider = ({ children }) => {
   const [records, setRecords] = useState([]);
   const { user } = useUser();
   
   const fetchRecords = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, skipping fetch');
+      return;
+    }
+    
+    console.log('Fetching records for user:', user.id);
+    console.log('API URL:', `${API_BASE_URL}/financial-records?userId=${user.id}`);
     
     try {
-      const response = await fetch(`http://localhost:3001/financial-records?userId=${user.id}`);
+      const response = await fetch(`${API_BASE_URL}/financial-records?userId=${user.id}`);
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
       if (response.ok) {
         const data = await response.json();
         console.log('Fetched records:', data);
         setRecords(data);
+      } else {
+        console.error('Response not ok:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
       }
     } catch (error) {
       console.error('Error fetching records:', error);
@@ -24,14 +42,18 @@ export const FinancialRecordContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log('User changed:', user?.id);
     if (user) {
       fetchRecords();
     }
   }, [user]);
 
   const addRecord = async (record) => {
+    console.log('Adding record:', record);
+    console.log('API URL:', `${API_BASE_URL}/financial-records`);
+    
     try {
-      const response = await fetch("http://localhost:3001/financial-records", {
+      const response = await fetch(`${API_BASE_URL}/financial-records`, {
         method: "POST",
         body: JSON.stringify(record),
         headers: {
@@ -39,9 +61,17 @@ export const FinancialRecordContextProvider = ({ children }) => {
         },
       });
 
+      console.log('Add record response status:', response.status);
+      console.log('Add record response ok:', response.ok);
+
       if (response.ok) {
         const newRecord = await response.json();
+        console.log('New record added:', newRecord);
         setRecords((prev) => [...prev, newRecord]);
+      } else {
+        console.error('Add record failed:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
       }
     } catch (err) {
       console.error('Error adding record:', err);
