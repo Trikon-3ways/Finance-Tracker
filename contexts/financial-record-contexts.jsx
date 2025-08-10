@@ -5,9 +5,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 export const FinancialRecordContext = createContext(undefined);
 
 // Get API URL from environment variable or use localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '');
 
-console.log('API_BASE_URL:', API_BASE_URL); // Debug log
+ console.log('Environment variable VITE_API_URL:', import.meta.env.VITE_API_URL); // Debug log
+console.log('API_BASE_URL after processing:', API_BASE_URL); // Debug log
 
 export const FinancialRecordContextProvider = ({ children }) => {
   const [records, setRecords] = useState([]);
