@@ -68,7 +68,18 @@ export const FinancialRecordContextProvider = ({ children }) => {
       if (response.ok) {
         const newRecord = await response.json();
         console.log('New record added:', newRecord);
-        setRecords((prev) => [...prev, newRecord]);
+        
+        // Update the records state with the new record
+        setRecords((prev) => {
+          const updatedRecords = [...prev, newRecord];
+          console.log('Updated records state:', updatedRecords);
+          return updatedRecords;
+        });
+        
+        // Also refresh the records from the server to ensure consistency
+        setTimeout(() => {
+          fetchRecords();
+        }, 100);
       } else {
         console.error('Add record failed:', response.status, response.statusText);
         const errorText = await response.text();

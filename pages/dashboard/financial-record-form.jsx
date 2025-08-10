@@ -10,7 +10,7 @@ const FinancialRecordForm = () => {
   const[date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const {user} = useUser();
   const {addRecord}=useFinancialRecord();
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!user) {
       console.error("User not logged in.");
@@ -28,13 +28,19 @@ const FinancialRecordForm = () => {
     // Here you would typically send financialRecord to your backend API
     console.log('Financial Record Submitted:', financialRecord);
     
-    // Reset form fields after submission
-    addRecord(financialRecord);
-    setDescription('');
-    setAmount('');
-    setCategory('laundry');
-    setPaymentMethod('cash');
-    setDate(new Date().toISOString().split('T')[0]);
+    try {
+      // Wait for the record to be added
+      await addRecord(financialRecord);
+      
+      // Only reset form fields after successful submission
+      setDescription('');
+      setAmount('');
+      setCategory('laundry');
+      setPaymentMethod('cash');
+      setDate(new Date().toISOString().split('T')[0]);
+    } catch (error) {
+      console.error('Failed to add record:', error);
+    }
   }
   
   return (

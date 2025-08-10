@@ -4,6 +4,10 @@ import { useFinancialRecord } from '../../contexts/financial-record-contexts';
 const FinancialRecordList = () => {
   const { records } = useFinancialRecord(); 
   
+  // Debug logging
+  console.log('FinancialRecordList render - records:', records);
+  console.log('Records length:', records.length);
+  
   return (
     <div className='table-container'>
       <h2>Financial Records</h2>
